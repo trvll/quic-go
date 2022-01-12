@@ -136,7 +136,7 @@ func (s *Server) ListenAndServeTLS(certFile, keyFile string) error {
 	config := &tls.Config{
 		Certificates: certs,
 		ClientAuth:   tls.RequireAndVerifyClientCert,
-		//ClientCAs:    pool,
+		ClientCAs:    pool,
 	}
 	return s.serveImpl(config, nil)
 }
