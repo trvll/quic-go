@@ -8,16 +8,28 @@ openssl req -x509 -sha256 -nodes -days 3650 -newkey rsa:2048 \
   -subj "/O=quic-go Certificate Authority/"
 
 echo "Generating CSR"
-openssl req -out cert.csr -new -newkey rsa:2048 -nodes -keyout priv.key \
+openssl req -out server.csr -new -newkey rsa:2048 -nodes -keyout server.key \
   -subj "/O=quic-go/"
 
 echo "Sign certificate:"
-openssl x509 -req -sha256 -days 3650 -in cert.csr  -out cert.pem \
+openssl x509 -req -sha256 -days 3650 -in server.csr  -out server.pem \
   -CA ca.pem -CAkey ca.key -CAcreateserial \
   -extfile <(printf "subjectAltName=DNS:localhost")
 
 # debug output the certificate
-openssl x509 -noout -text -in cert.pem
+openssl x509 -noout -text -in server.pem
+
+echo "Generating CSR"
+openssl req -out client.csr -new -newkey rsa:2048 -nodes -keyout client.key \
+  -subj "/O=quic-go/"
+
+echo "Sign certificate:"
+openssl x509 -req -sha256 -days 3650 -in client.csr  -out client.pem \
+  -CA ca.pem -CAkey ca.key -CAcreateserial \
+  -extfile <(printf "subjectAltName=DNS:localhost")
+
+# debug output the certificate
+openssl x509 -noout -text -in server.pem
 
 # we don't need the CA key, the serial number and the CSR any more
 rm ca.key cert.csr ca.srl

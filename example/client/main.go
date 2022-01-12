@@ -67,8 +67,16 @@ func main() {
 			return utils.NewBufferedWriteCloser(bufio.NewWriter(f), f)
 		})
 	}
+
+	certs := make([]tls.Certificate, 1)
+	certs[0], err = tls.LoadX509KeyPair(testdata.GetClientCertificatePaths())
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	roundTripper := &http3.RoundTripper{
 		TLSClientConfig: &tls.Config{
+			Certificates:       certs,
 			RootCAs:            pool,
 			InsecureSkipVerify: *insecure,
 			KeyLogWriter:       keyLog,
